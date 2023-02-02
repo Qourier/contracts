@@ -6,9 +6,6 @@ on:
 
 jobs:
   test:
-    strategy:
-      fail-fast: true
-
     name: Foundry project
     runs-on: ubuntu-latest
     steps:
@@ -18,12 +15,9 @@ jobs:
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
 
-      - name: Run Forge tests
-        run: |
-          forge test -vvv
+      - name: Run tests
+        run: forge test -vvv
 
   publish-npm:
     needs: test
