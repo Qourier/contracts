@@ -13,7 +13,8 @@ contract Hub is IHub {
         uint256 task_id,
         bytes32 module,
         bytes[5] params,
-        address callback, 
+        address callback,
+        uint256 tasks,
         uint256 createdAt
     );
     
@@ -21,6 +22,7 @@ contract Hub is IHub {
         uint256 task_id,
         bytes result,
         address qourier,
+        uint256 tasks,
         uint256 completedAt
     );
 
@@ -51,7 +53,7 @@ contract Hub is IHub {
         }
     }
 
-    modifier onlyCourier() {
+    modifier onlyQourier() {
         if (_personal != address(0) && _personal != msg.sender) {
             revert("This is a personal hub.");
         }
@@ -60,7 +62,7 @@ contract Hub is IHub {
 
     modifier lowPrice() {
         require(
-            msg.value >= _price, 
+            msg.value >= _price,
             "You have issued inadequate funding for the task."
         );
         _;
@@ -74,7 +76,7 @@ contract Hub is IHub {
         _;
     }
 
-    function createTask(
+    function createTask0(
         bytes32 module_
     ) payable public lowPrice supportModule(module_) {
         _createTask(module_, [bytes(""), "", "", "", ""]);
@@ -122,34 +124,37 @@ contract Hub is IHub {
         _task_id++;
         _tasks[_task_id] = Task({
             module: module_,
-            params: params_, 
+            params: params_,
             result: "",
             callback: msg.sender,
             qourier: address(0),
+            tasks: msg.value / _price,
             createdAt: block.timestamp,
             completedAt: 0
         });
         emit Created(
             _task_id, 
-            _tasks[_task_id].module, 
-            _tasks[_task_id].params, 
-            _tasks[_task_id].callback, 
+            _tasks[_task_id].module,
+            _tasks[_task_id].params,
+            _tasks[_task_id].callback,
+            _tasks[_task_id].tasks,
             _tasks[_task_id].createdAt
         );
     }
 
     function completeTask(
-        uint256 task_id_, 
+        uint256 task_id_,
         bytes memory result_
-    ) public onlyCourier {
+    ) public onlyQourier {
         Task storage t = _tasks[task_id_];
         require(
-            t.completedAt <= 0, 
+            t.tasks >= 1, 
             "The task had already been completed."
         );
 
         t.result = result_;
         t.qourier = msg.sender;
+        t.tasks -= 1;
         t.completedAt = block.timestamp;
 
         ICallback(t.callback).completeTask(task_id_, result_);
@@ -160,8 +165,16 @@ contract Hub is IHub {
             task_id_,
             t.result,
             t.qourier,
+            t.tasks,
             t.completedAt
         );
+    }
+
+    function topUpTask(
+        uint256 task_id_
+    ) public payable {
+        Task storage t = _tasks[task_id_];
+        t.tasks += msg.value / _price;
     }
 
     function getTask(

@@ -6,11 +6,11 @@ import "forge-std/Test.sol";
 import "../src/Factory.sol";
 import "../src/Hub.sol";
 import "../src/interfaces/IHub.sol";
-import "../src/example/HowToUse.sol";
+import "../src/example/SumOfNumbers.sol";
 
-contract HowToUseTest is Test, IHub {
+contract SumOfNumbersTest is Test, IHub {
     Hub public hub;
-    HowToUse public htu;
+    SumOfNumbers public example;
     bytes32[10] public modules;
 
     function setUp() public {
@@ -22,16 +22,16 @@ contract HowToUseTest is Test, IHub {
         Factory factory = new Factory();
         factory.newHub(1 * 10**18, modules, false);
         (address h, , , uint256 price,) = factory.getHubById(1);
-        htu = new HowToUse(h, price);
+        example = new SumOfNumbers(h, price);
         hub = Hub(h);
     }
 
     function testHowToUse() public {
-        htu.createTask{ value: 1 * 10**18 }();
+        example.createTask{ value: 1 * 10**18 }();
         hub.completeTask(1, bytes("7"));
         Task memory task = hub.getTask(1);
         assertEq(task.result, bytes("7"));
-        (, uint256 result) = htu.getTask();
+        (, uint256 result) = example.getTask();
         assertEq(result, 7);
     }
 }

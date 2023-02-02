@@ -9,6 +9,7 @@ interface IHub {
         bytes result;
         address callback;
         address qourier;
+        uint256 tasks;
         uint256 createdAt;
         uint256 completedAt;
     }
