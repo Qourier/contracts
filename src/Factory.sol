@@ -52,7 +52,7 @@ contract Factory {
     ) {
         uint256 last = _hub_id >= hub_id_ ? _hub_id - hub_id_ + 1 : 0;
         hub = _hubs[last];
-        require(hub == address(0), "Hub not found.");
+        require(hub != address(0), "Hub not found.");
         Hub h = Hub(hub);
         (personal, task_id, price, modules) = h.getHub();
     }
@@ -67,6 +67,7 @@ contract Factory {
         bytes32[10] memory modules
     ) {
         hub = hub_address_;
+        require(hub != address(0), "Hub not found.");
         Hub h = Hub(hub);
         (personal, task_id, price, modules) = h.getHub();
     }
