@@ -180,7 +180,8 @@ contract Hub is IHub {
     function getTask(
         uint256 task_id_
     ) public view returns(Task memory task) {
-        task = _tasks[task_id_];
+        uint256 last = _task_id >= task_id_ ? _task_id - task_id_ + 1 : 0;
+        task = _tasks[last];
     }
 
     function numberOfTasks() public view returns(uint256) {
@@ -188,7 +189,7 @@ contract Hub is IHub {
     }
 
     function getHub() public view returns(
-        address personal, 
+        address personal,
         uint256 task_id,
         uint256 price,
         bytes32[10] memory modules
@@ -207,7 +208,9 @@ contract Hub is IHub {
 
     function withdraw() public payable {
         if (getBalance(msg.sender) > 0) {
-            payable(msg.sender).transfer(getBalance(msg.sender));
+            uint256 balance = _balances[msg.sender];
+            _balances[msg.sender] = 0;
+            payable(msg.sender).transfer(balance);
         } 
     }
 }
