@@ -39,6 +39,7 @@ contract HubTest is Test, IHub {
     function testErrorCreateTask() public {
         vm.expectRevert(bytes("You have issued inadequate funding for the task."));
         publicHub.createTask2(module, [bytes("5"), bytes("2")]);
+        vm.expectRevert(bytes("Task not found."));
         Task memory task = publicHub.getTask(1);
         assertEq(task.module, 0x0);
     }
