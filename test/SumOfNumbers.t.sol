@@ -27,11 +27,11 @@ contract SumOfNumbersTest is Test, IHub {
     }
 
     function testHowToUse() public {
-        example.createTask{ value: 1 * 10**18 }();
-        hub.completeTask(1, bytes("7"));
+        example.createTask{ value: 1 * 10**18 }("11", "24");
+        hub.completeTask(1, bytes("35"));
         Task memory task = hub.getTask(1);
-        assertEq(task.result, bytes("7"));
+        assertEq(task.result, bytes("35"));
         (, uint256 result) = example.getTask();
-        assertEq(result, 7);
+        assertEq(result, 35);
     }
 }

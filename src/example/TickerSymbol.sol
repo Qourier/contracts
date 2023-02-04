@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import "../Hub.sol";
+import "@qourier/contracts/Hub.sol";
 
 contract TickerSymbol {
     address public hub;
@@ -15,17 +15,17 @@ contract TickerSymbol {
         price = price_;
     }
 
-    function createTask() public payable {
+    function createTask(string memory symbol_) public payable {
         Hub(hub).createTask1{ value: price }(
-            bytes32("ticker-symbol"), 
-            [bytes("FILETH")]
+            bytes32("ticker-symbol"),
+            [bytes(symbol_)]
         );
     }
 
     function completeTask(uint256 id_, bytes memory result_) external {
         require(msg.sender == hub, "Only Qourier can change the state.");
         id = id_;
-        result = bytesToUint(result_); // 0.00336200 * 10 ** 18 = 3362000000000000
+        result = bytesToUint(result_);
     }
 
     function getTask() public view returns(uint256, uint256) {
