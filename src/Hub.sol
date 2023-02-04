@@ -182,6 +182,7 @@ contract Hub is IHub {
     ) public view returns(Task memory task) {
         uint256 last = _task_id >= task_id_ ? _task_id - task_id_ + 1 : 0;
         task = _tasks[last];
+        require(task.callback == address(0), "Task not found.");
     }
 
     function numberOfTasks() public view returns(uint256) {
