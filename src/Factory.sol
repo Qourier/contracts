@@ -50,7 +50,8 @@ contract Factory {
         uint256 price,
         bytes32[10] memory modules
     ) {
-        hub = _hubs[hub_id_];
+        uint256 last = _hub_id >= hub_id_ ? _hub_id - hub_id_ + 1 : 0;
+        hub = _hubs[last];
         Hub h = Hub(hub);
         (personal, task_id, price, modules) = h.getHub();
     }
